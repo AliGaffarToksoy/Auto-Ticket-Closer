@@ -1,0 +1,17 @@
+# Python / Cache Dosyaları
+__pycache__/
+*.py[cod]
+*.class
+
+# Sanal Ortamlar (Virtual Environments)
+venv/
+env/
+.venv/
+
+# IDE ve Editör Ayarları (PyCharm, VSCode)
+.idea/
+.vscode/
+*.swp
+
+# İşletim Sistemi Dosyaları (Mac için kritik)
+.DS_Store
