@@ -1,0 +1,14 @@
+[HUAWEI CLOUD - INTERNAL CCE RUNBOOK v2.4]
+
+Error Code: OOMKilled
+Symptom: Uygulama podları sürekli çöküyor (CrashLoopBackOff) ve load balancer 502 Bad Gateway hatası döndürüyor. Loglarda "java.lang.OutOfMemoryError: Java heap space" görülür.
+Root Cause: Frontend veya Backend servisine tanımlanan Kubernetes bellek (RAM) limitleri, gelen trafik yükü için yetersiz kalmaktadır.
+Standard Operating Procedure (SOP) for Resolution:
+1. İlgili deployment'ın adını tespit edin.
+2. kubectl set resources deployment <deployment_name> --limits=memory=2Gi komutuyla limiti artırın.
+3. Müşteriye sorunun ani trafik artışından kaynaklandığını ve limitlerin yükseltildiğini bildirin.
+
+Error Code: ImagePullBackOff
+Symptom: Pod ayağa kalkamıyor.
+Root Cause: SWR (Software Repository for Container) üzerinde imaj bulunamıyor veya yetki hatası.
+SOP: İmaj etiketini ve SWR IAM yetkilerini kontrol edin.C
