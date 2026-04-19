@@ -10,7 +10,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
 
-# 1. Güvenlik: .env dosyasından API anahtarını gizlice yükle
+
 load_dotenv()
 if not os.getenv("GOOGLE_API_KEY"):
     raise ValueError("🚨 Kiritik Hata: GOOGLE_API_KEY bulunamadı! Lütfen .env dosyanızı kontrol edin.")
@@ -33,15 +33,15 @@ class AIOpsRAGEngine:
     def _initialize_knowledge_base(self):
         print("📚 Huawei Runbook Dokümanları Vektör Uzayına Yükleniyor...")
 
-        # Resmi dokümantasyonu oku
+
         loader = TextLoader(self.doc_path)
         docs = loader.load()
 
-        # Metni LLM'in rahat sindirebileceği küçük parçalara (chunk) böl
+
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
         splits = text_splitter.split_documents(docs)
 
-        # ChromaDB (Vektör Veritabanı) oluştur ve belleğe al
+
         vectorstore = Chroma.from_documents(documents=splits, embedding=self.embeddings,
                                             persist_directory=self.vector_db_path)
         print("✅ Bilgi Bankası (Knowledge Base) Hazır ve Vektörleştirildi!\n")
@@ -50,10 +50,10 @@ class AIOpsRAGEngine:
     def resolve_ticket(self, ticket_text, k8s_logs):
         print("🔍 RAG Sistemi: Bilet ve Loglar Analiz Ediliyor...")
 
-        # Veritabanında en alakalı dokümanları bulacak olan Retriever
+
         retriever = self.vectorstore.as_retriever(search_kwargs={"k": 2})
 
-        # AI'a verdiğimiz SRE (Site Reliability Engineer) Rolü
+
         system_prompt = (
             "Sen Huawei Cloud CCE (Kubernetes) ekibinde çalışan Kıdemli bir SRE mühendisisin. "
             "Aşağıdaki bağlamı (Context - resmi Huawei dokümanları) kullanarak müşterinin yaşadığı sorunu analiz et. "
@@ -73,7 +73,7 @@ class AIOpsRAGEngine:
         def format_docs(docs):
             return "\n\n".join(doc.page_content for doc in docs)
 
-        # Zinciri (Chain) Kur: Soruyu al -> Doküman bul -> Prompt'a ekle -> Gemini'ye yolla -> Metin Çıktısı Al
+
         rag_chain = (
                 {"context": retriever | format_docs, "ticket": RunnablePassthrough(), "logs": RunnablePassthrough()}
                 | prompt
@@ -83,7 +83,7 @@ class AIOpsRAGEngine:
 
         print("⚙️ Gemini LLM, dokümanları kullanarak otonom çözüm üretiyor...\n")
 
-        # LLM'i tetikle
+
         solution = rag_chain.invoke({"ticket": ticket_text, "logs": k8s_logs})
         return solution
 
