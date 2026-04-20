@@ -7,7 +7,7 @@ from langchain_community.vectorstores import Chroma
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 
 
@@ -22,11 +22,9 @@ class AIOpsRAGEngine:
         self.vector_db_path = "../knowledge_base/chroma_db"
         self.doc_path = "../knowledge_base/huawei_runbook.txt"
 
-        # Google Gemini Modelleri (Hem gömme hem de metin üretimi için)
-        # Veri güvenliği ve sıfır maliyet için yerel açık kaynaklı Embedding kullanıyoruz
+
         self.embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-        self.llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash",
-                                          temperature=0.1)  # Düşük sıcaklık = Sıfır halüsinasyon
+        self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.1)
 
         self.vectorstore = self._initialize_knowledge_base()
 
@@ -50,41 +48,37 @@ class AIOpsRAGEngine:
     def resolve_ticket(self, ticket_text, k8s_logs):
         print("🔍 RAG Sistemi: Bilet ve Loglar Analiz Ediliyor...")
 
-
+        # 1. Aşama: Retriever ile Vektör Veritabanında Arama Yap
+        # Retriever bir 'string' bekler, o yüzden aramayı loglardaki hata mesajıyla yapıyoruz.
         retriever = self.vectorstore.as_retriever(search_kwargs={"k": 2})
+        relevant_docs = retriever.invoke(k8s_logs)
 
+        # Gelen dokümanları tek bir metne dönüştür
+        context_text = "\n\n".join(doc.page_content for doc in relevant_docs)
 
+        # 2. Aşama: AI'a SRE Rolü ve Bağlamı (Context) Ver
         system_prompt = (
             "Sen Huawei Cloud CCE (Kubernetes) ekibinde çalışan Kıdemli bir SRE mühendisisin. "
-            "Aşağıdaki bağlamı (Context - resmi Huawei dokümanları) kullanarak müşterinin yaşadığı sorunu analiz et. "
-            "Bağlamda olmayan HİÇBİR ŞEYİ uydurma (Halüsinasyon yapma). "
-            "Çıktını şu formatta ver:\n"
+            "Aşağıdaki resmi dokümantasyon bağlamını kullanarak müşterinin yaşadığı sorunu analiz et.\n\n"
+            f"BAĞLAM (RESMİ DOKÜMAN): \n{context_text}\n\n"
+            "Bağlamda olmayan HİÇBİR ŞEYİ uydurma. Çıktını şu formatta ver:\n"
             "KÖK NEDEN: [Tek cümlelik tespit]\n"
             "OTONOM ÇÖZÜM KOMUTU: [Çalıştırılacak kubectl komutu]\n"
-            "MÜŞTERİ NOTU: [Müşteriye yazılacak profesyonel SLA yanıtı]\n\n"
-            "Bağlam (Context): {context}"
+            "MÜŞTERİ NOTU: [Müşteriye yazılacak profesyonel SLA yanıtı]"
         )
 
         prompt = ChatPromptTemplate.from_messages([
             ("system", system_prompt),
-            ("human", "Müşteri Şikayeti: {ticket}\n\nKubernetes Logları: {logs}")
+            ("human", f"Müşteri Şikayeti: {ticket_text}\n\nKubernetes Logları: {k8s_logs}")
         ])
 
-        def format_docs(docs):
-            return "\n\n".join(doc.page_content for doc in docs)
-
-
-        rag_chain = (
-                {"context": retriever | format_docs, "ticket": RunnablePassthrough(), "logs": RunnablePassthrough()}
-                | prompt
-                | self.llm
-                | StrOutputParser()
-        )
+        # 3. Aşama: Basit ve Temiz Zincir (Prompt -> LLM -> String Output)
+        rag_chain = prompt | self.llm | StrOutputParser()
 
         print("⚙️ Gemini LLM, dokümanları kullanarak otonom çözüm üretiyor...\n")
 
-
-        solution = rag_chain.invoke({"ticket": ticket_text, "logs": k8s_logs})
+        # LLM'i tetikle (Artık retriever burada çalışmıyor, veriyi önceden aldık)
+        solution = rag_chain.invoke({})
         return solution
 
 
