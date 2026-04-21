@@ -82,7 +82,7 @@ class AIOpsRAGEngine:
 
         print("⚙️ Gemini LLM, dokümanları kullanarak otonom çözüm üretiyor...\n")
 
-        # LLM'i tetikle (Artık retriever burada çalışmıyor, veriyi önceden aldık)
+
         solution = rag_chain.invoke({})
         return solution
 
