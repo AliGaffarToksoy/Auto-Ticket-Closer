@@ -19,12 +19,16 @@ if not os.getenv("GOOGLE_API_KEY"):
 class AIOpsRAGEngine:
     def __init__(self):
         print("🧠 AIOps RAG Motoru Başlatılıyor...")
-        self.vector_db_path = "../knowledge_base/chroma_db"
-        self.doc_path = "../knowledge_base/huawei_runbook.txt"
+        # Dosya yollarını Docker veya Lokal fark etmeksizin dinamik olarak bul
+        current_dir = os.path.dirname(os.path.abspath(__file__))  # src klasörü
+        base_dir = os.path.dirname(current_dir)  # Ana proje klasörü
+
+        self.vector_db_path = os.path.join(base_dir, "knowledge_base", "chroma_db")
+        self.doc_path = os.path.join(base_dir, "knowledge_base", "huawei_runbook.txt")
 
 
         self.embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-        self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.1)
+        self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite", temperature=0.1)
 
         self.vectorstore = self._initialize_knowledge_base()
 
@@ -59,12 +63,13 @@ class AIOpsRAGEngine:
         # 2. Aşama: AI'a SRE Rolü ve Bağlamı (Context) Ver
         system_prompt = (
             "Sen Huawei Cloud CCE (Kubernetes) ekibinde çalışan Kıdemli bir SRE mühendisisin. "
-            "Aşağıdaki resmi dokümantasyon bağlamını kullanarak müşterinin yaşadığı sorunu analiz et.\n\n"
+            "Aşağıdaki resmi dokümantasyon bağlamını (SOP) HARFİYEN uygulamak zorundasın.\n\n"
             f"BAĞLAM (RESMİ DOKÜMAN): \n{context_text}\n\n"
-            "Bağlamda olmayan HİÇBİR ŞEYİ uydurma. Çıktını şu formatta ver:\n"
-            "KÖK NEDEN: [Tek cümlelik tespit]\n"
-            "OTONOM ÇÖZÜM KOMUTU: [Çalıştırılacak kubectl komutu]\n"
-            "MÜŞTERİ NOTU: [Müşteriye yazılacak profesyonel SLA yanıtı]"
+            "KURALLAR:\n"
+            "1. KÖK NEDEN: Bağlamdan yola çıkarak loglardaki spesifik isimlerle tespit yap.\n"
+            "2. OTONOM ÇÖZÜM KOMUTU: Asla 'get' veya 'describe' gibi pasif komutlar önerme! Doğrudan SOP'deki AKSİYON komutunu (örn: kubectl apply -f secret.yaml) loglardaki isme göre uyarla.\n"
+            "3. MÜŞTERİ NOTU: Müşteriye 'şunu yapın' deme. Çözümü BİZİM uyguladığımızı ve kesintinin giderildiğini profesyonel bir SLA diliyle anlat.\n\n"
+            "Çıktını KÖK NEDEN, OTONOM ÇÖZÜM KOMUTU ve MÜŞTERİ NOTU başlıklarıyla ver."
         )
 
         prompt = ChatPromptTemplate.from_messages([

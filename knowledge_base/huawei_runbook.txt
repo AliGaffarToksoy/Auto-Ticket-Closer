@@ -12,3 +12,11 @@ Error Code: ImagePullBackOff
 Symptom: Pod ayağa kalkamıyor.
 Root Cause: SWR (Software Repository for Container) üzerinde imaj bulunamıyor veya yetki hatası.
 SOP: İmaj etiketini ve SWR IAM yetkilerini kontrol edin.C
+
+Error Code: CreateContainerConfigError
+Symptom: Uygulama podları "CreateContainerConfigError" veya "CrashLoopBackOff" durumunda kalıyor ve ayağa kalkamıyor.
+Root Cause: Deployment dosyasında çağrılan kritik bir ConfigMap veya Secret objesi Kubernetes cluster'ında bulunamamıştır. Geliştiriciler şifreleri veya ayar dosyalarını yüklemeyi unutmuş olabilir.
+Standard Operating Procedure (SOP) for Resolution:
+1. Eksik olan ConfigMap veya Secret ismini loglardan tespit edin.
+2. İlgili konfigürasyon dosyasını (örneğin secret.yaml) kubectl apply -f komutuyla cluster'a yükleyin.
+3. Müşteriye, ödeme veya veritabanı gibi kritik servislerin şifre/ayar dosyalarının eksik olduğunu, güvenlik prosedürleri gereği bu dosyaların sisteme yüklenerek sorunun giderildiğini bildirin.
