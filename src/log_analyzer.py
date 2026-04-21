@@ -6,8 +6,7 @@ def fetch_and_analyze_logs(cluster_name, namespace):
     time.sleep(1)  # Gerçekçilik efekti
     print("🔎 Otonom Sistem: Çöken Pod'ların son 50 satırlık logları taranıyor...\n")
 
-    # Gerçek hayatta bu kısım Huawei SDK veya Kubernetes API (kubectl) ile yapılır.
-    # Biz burada logları simüle ediyoruz.
+
     simulated_k8s_logs = """
     [INFO] 2026-04-17 15:42:01 - FastAPI application started successfully.
     [INFO] 2026-04-17 15:45:12 - Handling incoming traffic spike (1000 req/sec)...
