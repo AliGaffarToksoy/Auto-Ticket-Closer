@@ -241,6 +241,17 @@ Cloud & DevOps Engineer
 > “The future of infrastructure is not monitoring — it is autonomy.”
 
 ---
+---
+# 📸 System Overview
+
+## 🖥️ SRE Dashboard
+<img width="1512" height="860" alt="Ekran Resmi 2026-04-21 19 12 19" src="https://github.com/user-attachments/assets/1e767b98-cf27-4c9a-a5ef-cd4b8997f3a1" />
+
+## ⚙️ AI Engine (Terminal View)
+<img width="1512" height="949" alt="Ekran Resmi 2026-04-21 19 12 27 1" src="https://github.com/user-attachments/assets/9dc540c0-5a57-48ef-a1d9-dee838bab793" />
+
+## 🐳 Containerized Deployment
+<img width="1512" height="949" alt="Ekran Resmi 2026-04-21 18 39 41" src="https://github.com/user-attachments/assets/c2470ff3-8359-422c-9f0e-1d3dcc56001e" />
 
 ## ⭐ Final Statement
 
