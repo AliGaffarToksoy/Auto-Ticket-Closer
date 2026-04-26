@@ -24,7 +24,6 @@ Built on **Retrieval-Augmented Generation (RAG)** to ensure:
 
 ---
 # 📸 System Overview
-
 ## 🖥️ SRE Dashboard
 <img width="1512" height="860" alt="Ekran Resmi 2026-04-21 19 12 19" src="https://github.com/user-attachments/assets/1e767b98-cf27-4c9a-a5ef-cd4b8997f3a1" />
 
