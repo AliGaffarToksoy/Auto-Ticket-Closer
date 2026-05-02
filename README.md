@@ -1,4 +1,4 @@
-# 🚀 Auto-Ticket-Closer: Autonomous AIOps SRE Assistant
+#  Auto-Ticket-Closer: Autonomous AIOps SRE Assistant
 
 > **AI-Powered Incident Resolution Engine for Cloud-Native Systems**  
 > A production-grade, RAG-driven AIOps platform that autonomously detects, analyzes, and resolves infrastructure incidents in real time.
@@ -35,7 +35,7 @@ Built on **Retrieval-Augmented Generation (RAG)** to ensure:
 
 ---
 
-## 🎯 Vision
+##  Vision
 
 > “Infrastructure should not only be observable — it should be self-healing.”
 
